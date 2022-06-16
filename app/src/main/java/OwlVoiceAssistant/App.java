@@ -150,6 +150,7 @@ public class App {
                 .setWakeWordCallback(wakeWordCallback)
                 .setContextPath(rhinoPath)
                 .setInferenceCallback(inferenceCallback)
+                .setPorcupineSensitivity(0.7f)
                 .build();
 
         logger.info("Initialized Picovoice");
