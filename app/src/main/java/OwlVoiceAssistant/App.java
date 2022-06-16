@@ -21,7 +21,7 @@ import java.util.Map;
 
 public class App {
 
-    private static final Logger logger = LogManager.getLogger(App.class.getName());
+    private static final Logger logger = LogManager.getLogger();
     private TTS _tts;
 
     private Map<String, CommandInterface> intentMap;
@@ -63,8 +63,7 @@ public class App {
                     .getResourceAsStream(path);
             if(inputStream == null) throw new NullPointerException("Input stream was null while trying to read picovoice key file path");
 
-            String result = IOUtils.toString(inputStream, StandardCharsets.UTF_8);
-            return  result;
+            return IOUtils.toString(inputStream, StandardCharsets.UTF_8);
 
         } catch(NullPointerException e) {
             logger.fatal("failed to load in key path: {}\nexception: {}", path, e);
@@ -79,6 +78,7 @@ public class App {
 
     public void Run () throws PicovoiceException, LineUnavailableException {
         InitializeTTS();
+        logger.info("hello");
         this.intentMap = GenerateIntentCommandMap.MapCommands();
 
         var rhinoPath = this.getClass()
@@ -197,7 +197,7 @@ public class App {
 //        System.out.println("Default wake commands");
 //        Porcupine.BUILT_IN_KEYWORD_PATHS.forEach((key,value) -> System.out.println(key + ":" + value));
 //        System.out.println("-----\n");
-        PropertyConfigurator.configure("log4j2.properties");
+        PropertyConfigurator.configure("log4j2.xml");
         App app = new App();
         try {
             app.Run();

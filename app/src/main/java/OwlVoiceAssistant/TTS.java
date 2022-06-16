@@ -3,8 +3,6 @@ package OwlVoiceAssistant;
 import marytts.LocalMaryInterface;
 import marytts.exceptions.MaryConfigurationException;
 import marytts.exceptions.SynthesisException;
-import marytts.util.data.audio.AudioPlayer;
-import marytts.util.data.audio.MaryAudioUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -14,7 +12,7 @@ import java.util.Objects;
 import javax.sound.sampled.*;
 
 public class TTS {
-    private static final Logger logger = LogManager.getLogger(TTS.class.getName());
+    private static final Logger logger = LogManager.getLogger(TTS.class);
     private final String voiceName;
 
     // buffer size for the audio streaming
@@ -30,7 +28,7 @@ public class TTS {
             mary = new LocalMaryInterface();
             mary.setVoice(this.voiceName);
         } catch (MaryConfigurationException e) {
-            System.err.println("Could not initialize MaryTTS interface: " + e.getMessage());
+            logger.fatal("Could not initialize MaryTTS interface: {}", e);
             System.exit(1);
         }
     }
