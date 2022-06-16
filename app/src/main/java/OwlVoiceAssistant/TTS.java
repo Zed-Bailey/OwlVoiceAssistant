@@ -28,7 +28,7 @@ public class TTS {
             mary = new LocalMaryInterface();
             mary.setVoice(this.voiceName);
         } catch (MaryConfigurationException e) {
-            logger.fatal("Could not initialize MaryTTS interface: {}", e);
+            logger.fatal("Could not initialize MaryTTS interface: ", e);
             System.exit(1);
         }
     }
