@@ -1,6 +1,12 @@
 # Owl voice assistant
 An offline privacy first voice assistant
 
+## Prerequisites
+
+- mpd (Music player daemon) setup and listening on localhost:6600
+  - in the future this will be configured with a config file
+
+
 ## Building
 
 1. to build the application clone the repo
@@ -34,6 +40,12 @@ commands in square brackets `[]` are optional words that can be said
 voices were installed with the marytts gui installer (installed with the marytts server)
 then copied from their install location to this projects `lib/voices` folder
 
+
+## Roadmap
+
+pass in a config file via a cli command containing various keys and settings
+- mpd url,port, password if one.
+- picovoice sdk key
 
 ## Custom voice
 

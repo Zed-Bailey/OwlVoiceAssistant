@@ -1,5 +1,7 @@
 package OwlVoiceAssistant;
 
+import OwlVoiceAssistant.Commands.CommandInterface;
+import OwlVoiceAssistant.Commands.MusicCommand;
 import ai.picovoice.picovoice.Picovoice;
 import ai.picovoice.picovoice.PicovoiceException;
 import ai.picovoice.picovoice.PicovoiceInferenceCallback;
@@ -20,11 +22,15 @@ import java.util.Map;
 public class App {
 
     private static final Logger logger = LogManager.getLogger(App.class.getName());
-    public TTS _tts;
+    private TTS _tts;
+
+    private Map<String, CommandInterface> intentMap;
+
+
 
     // FIXME? pass these paths through main function rather then hardcoding them, have them be passed as cli arguments?
-    private final String porcupineKeyword = "computer_mac.ppn";
-    private final String rhinoContextPath = "OwlCommands_mac.rhn";
+    private final String porcupineKeyword = "WakeWord.ppn";
+    private final String rhinoContextPath = "RhinoIntents.rhn";
     private final String picovoiceKeyPath = "picovoicekey.txt";
 
 
@@ -44,6 +50,12 @@ public class App {
         }
     }
 
+    /**
+     * Read the file that stores the picovoice key
+     * if the file is not found then the system will exit and a fatal log will be created.
+     * @param path the file path to read
+     * @return a string containing the  key
+     */
     public String ReadPicoKeyFile(String path) {
         try {
             var inputStream = this.getClass()
@@ -67,6 +79,7 @@ public class App {
 
     public void Run () throws PicovoiceException, LineUnavailableException {
         InitializeTTS();
+        this.intentMap = GenerateIntentCommandMap.MapCommands();
 
         var rhinoPath = this.getClass()
                 .getClassLoader()
@@ -79,8 +92,8 @@ public class App {
                 .getPath();
 
         // set an inbuilt wake word paths
-        final Porcupine.BuiltInKeyword builtInKeyword = Porcupine.BuiltInKeyword.valueOf("JARVIS");
-        wakeWordPath = Porcupine.BUILT_IN_KEYWORD_PATHS.get(builtInKeyword);
+//        final Porcupine.BuiltInKeyword builtInKeyword = Porcupine.BuiltInKeyword.valueOf("JARVIS");
+//        wakeWordPath = Porcupine.BUILT_IN_KEYWORD_PATHS.get(builtInKeyword);
 
         if(rhinoPath == null) {
             throw new IllegalArgumentException("Could not find rhino context file: " + this.rhinoContextPath + " in the class path");
@@ -97,6 +110,12 @@ public class App {
             System.out.println("Wake word detected!");
             // let user know wake word was detected
             //TODO: light up eyes and play notification sound?
+
+            // pause music is it's currently playing
+            if (MusicCommand.CurrentlyPlaying) {
+                MusicCommand.Pause();
+            }
+
         };
 
         PicovoiceInferenceCallback inferenceCallback = inference -> {
@@ -107,18 +126,24 @@ public class App {
                 System.out.println(intent);
                 slots.forEach((key, value) -> System.out.println("\t" + key + ":" + value));
 
-                String speak;
-                switch(intent) {
-                    case "musicControl":
-                        speak = slots.get("action") + " music";
-                        break;
-                    case "getWeather":
-                        speak = "The weather is currently clouding in " + slots.get("location");
-                        break;
-                    default:
-                        speak = "No action associated with that intent";
+                String speak = this.intentMap.get(intent).ExecuteCommand(intent, slots);
+                if(speak == null) {
+                    logger.error("No mapping for the intent: {}, was found in the intentCommandMap. Did you add it in GenerateIntentCommandMap.MapCommands", intent);
+                } else {
+                    _tts.Speak(speak);
                 }
-                _tts.Speak(speak);
+
+//                switch(intent) {
+//                    case "musicControl":
+//                        speak = slots.get("action") + " music";
+//                        break;
+//                    case "getWeather":
+//                        speak = "The weather is currently clouding in " + slots.get("location");
+//                        break;
+//                    default:
+//                        speak = "No action associated with that intent";
+//                }
+
                 // use intent and slots to trigger action
 
             } else {
