@@ -7,17 +7,15 @@ An offline privacy first voice assistant
   - in the future this will be configured with a config file
 
 
-## Building
-
-1. to build the application clone the repo
-2. navigate to `app/src/main/resources` and add 3 files there
-   1. file 1 is a your picovoice sdk key, this key should be in a file called `picovoicekey.txt`
-   2. file 2 is the Rhino command intents these can be created from the picovoice console
-   you should rename the file to `RhinoIntents.rhn`
-   3. file 3 is the wake word, you can create your own in the picovoice console, or you can use one 
-      of the free ones [available here](https://github.com/Picovoice/porcupine/tree/master/resources/keyword_files). the file should be called `WakeWord.ppn`
-3. navigate to the root directory and run `./gradlew build`
-
+## Running
+Create a configuration.properties file with the following key value pairs defined
+```properties
+rhinoPath={path to rhino .rhn intents file}
+porcupinePath={path to .ppn wake word file}
+picovoiceKey={your picovoice key}
+```
+you can then run the application with
+`java -jar app.jar configuration.properties`
 
 ## Commands
 commands in parentheses `()` are possible options for the command
