@@ -6,33 +6,25 @@ import ai.picovoice.picovoice.Picovoice;
 import ai.picovoice.picovoice.PicovoiceException;
 import ai.picovoice.picovoice.PicovoiceInferenceCallback;
 import ai.picovoice.picovoice.PicovoiceWakeWordCallback;
-import ai.picovoice.porcupine.Porcupine;
-import org.apache.commons.io.IOUtils;
 import org.apache.log4j.PropertyConfigurator;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import javax.sound.sampled.*;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.nio.charset.StandardCharsets;
 import java.util.Map;
+import java.util.Properties;
 
 public class App {
 
-    private static final Logger logger = LogManager.getLogger();
+    private static final Logger logger = LogManager.getLogger(App.class);
     private TTS _tts;
 
     private Map<String, CommandInterface> intentMap;
-
-
-
-    // FIXME? pass these paths through main function rather then hardcoding them, have them be passed as cli arguments?
-    private final String porcupineKeyword = "WakeWord.ppn";
-    private final String rhinoContextPath = "RhinoIntents.rhn";
-    private final String picovoiceKeyPath = "picovoicekey.txt";
-
 
     /**
      * Initialize the text to speech class
@@ -50,61 +42,11 @@ public class App {
         }
     }
 
-    /**
-     * Read the file that stores the picovoice key
-     * if the file is not found then the system will exit and a fatal log will be created.
-     * @param path the file path to read
-     * @return a string containing the  key
-     */
-    public String ReadPicoKeyFile(String path) {
-        try {
-            var inputStream = this.getClass()
-                    .getClassLoader()
-                    .getResourceAsStream(path);
-            if(inputStream == null) throw new NullPointerException("Input stream was null while trying to read picovoice key file path");
 
-            return IOUtils.toString(inputStream, StandardCharsets.UTF_8);
-
-        } catch(NullPointerException e) {
-            logger.fatal("failed to load in key path: {}\nexception: {}", path, e);
-            System.exit(1);
-        } catch (IOException e) {
-            logger.fatal("failed to read key file path = {}\nexception: {}", path, e);
-            System.exit(1);
-        }
-
-        return "";
-    }
-
-    public void Run () throws PicovoiceException, LineUnavailableException {
+    public void Run (String rhinoPath, String porcupinePath, String picovoiceKey) throws PicovoiceException, LineUnavailableException {
         InitializeTTS();
-        logger.info("hello");
+
         this.intentMap = GenerateIntentCommandMap.MapCommands();
-
-        var rhinoPath = this.getClass()
-                .getClassLoader()
-                .getResource(this.rhinoContextPath)
-                .getPath();
-
-        var wakeWordPath = this.getClass()
-                .getClassLoader()
-                .getResource(this.porcupineKeyword)
-                .getPath();
-
-        // set an inbuilt wake word paths
-//        final Porcupine.BuiltInKeyword builtInKeyword = Porcupine.BuiltInKeyword.valueOf("JARVIS");
-//        wakeWordPath = Porcupine.BUILT_IN_KEYWORD_PATHS.get(builtInKeyword);
-
-        if(rhinoPath == null) {
-            throw new IllegalArgumentException("Could not find rhino context file: " + this.rhinoContextPath + " in the class path");
-        }
-
-        if (wakeWordPath == null) {
-            throw new IllegalArgumentException("Could not find porcupine keyword file: " + this.porcupineKeyword + " in the class path");
-        }
-
-        var picovoicekey = ReadPicoKeyFile(this.picovoiceKeyPath);
-
 
         PicovoiceWakeWordCallback wakeWordCallback = () -> {
             System.out.println("Wake word detected!");
@@ -140,13 +82,10 @@ public class App {
         };
 
 
-
-
         Picovoice picovoice;
         picovoice = new Picovoice.Builder()
-                // TODO read cli arguments to get model paths and key rather then hard coding it in
-                .setAccessKey(picovoicekey)
-                .setKeywordPath(wakeWordPath)
+                .setAccessKey(picovoiceKey)
+                .setKeywordPath(porcupinePath)
                 .setWakeWordCallback(wakeWordCallback)
                 .setContextPath(rhinoPath)
                 .setInferenceCallback(inferenceCallback)
@@ -197,15 +136,25 @@ public class App {
 //        System.out.println("Default wake commands");
 //        Porcupine.BUILT_IN_KEYWORD_PATHS.forEach((key,value) -> System.out.println(key + ":" + value));
 //        System.out.println("-----\n");
-        PropertyConfigurator.configure("log4j2.xml");
-        App app = new App();
-        try {
-            app.Run();
+
+        if(args.length != 1) {
+            System.out.println("Path to properties file is required");
+            return;
         }
-        catch(PicovoiceException | LineUnavailableException e) {
+
+        PropertyConfigurator.configure("log4j2.xml");
+        try(InputStream stream = new FileInputStream(args[0])) {
+            Properties prop = new Properties();
+            prop.load(stream);
+            App app = new App();
+
+            app.Run(prop.getProperty("rhinoPath"),prop.getProperty("porcupinePath"), prop.getProperty("picovoiceKey"));
+
+        } catch(IOException e) {
+            System.err.printf("Failed to stream the properties file!: %s\n", e);
+            System.exit(1);
+        } catch(PicovoiceException | LineUnavailableException e) {
             logger.fatal("Failed to initialize picovoice: exception = {}", e.getMessage());
         }
-
-
     }
 }
