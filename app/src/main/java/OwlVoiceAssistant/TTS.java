@@ -10,6 +10,7 @@ import org.apache.logging.log4j.Logger;
 
 
 import java.io.IOException;
+import java.util.Objects;
 import javax.sound.sampled.*;
 
 public class TTS {
@@ -36,6 +37,10 @@ public class TTS {
 
     //TODO: Handle thrown exception
     public void Speak(String inputText)  {
+        if (Objects.equals(inputText, "") || inputText == null) {
+            return;
+        }
+
         try {
             // synthesize
             AudioInputStream audio = mary.generateAudio(inputText);
