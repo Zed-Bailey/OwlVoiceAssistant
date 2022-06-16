@@ -123,28 +123,16 @@ public class App {
                 final String intent = inference.getIntent();
                 final Map<String, String> slots = inference.getSlots();
 
-                System.out.println(intent);
-                slots.forEach((key, value) -> System.out.println("\t" + key + ":" + value));
+//                System.out.println(intent);
+//                slots.forEach((key, value) -> System.out.println("\t" + key + ":" + value));
 
                 String speak = this.intentMap.get(intent).ExecuteCommand(intent, slots);
                 if(speak == null) {
                     logger.error("No mapping for the intent: {}, was found in the intentCommandMap. Did you add it in GenerateIntentCommandMap.MapCommands", intent);
+                    _tts.Speak("Sorry i could not find a command for the intent " + intent);
                 } else {
                     _tts.Speak(speak);
                 }
-
-//                switch(intent) {
-//                    case "musicControl":
-//                        speak = slots.get("action") + " music";
-//                        break;
-//                    case "getWeather":
-//                        speak = "The weather is currently clouding in " + slots.get("location");
-//                        break;
-//                    default:
-//                        speak = "No action associated with that intent";
-//                }
-
-                // use intent and slots to trigger action
 
             } else {
                 _tts.Speak("I have no idea what you want me to do!");
