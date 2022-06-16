@@ -26,10 +26,14 @@ e.g. `(pause, play) music` can be evaluated as `play music` or `pause music`
 commands in square brackets `[]` are optional words that can be said
 
 - '(play, pause, shuffle, skip, rewind, back) music'
+
+### Commands on the roadmap
 - 'tell me a joke'
 - 'tell me a dark joke'
 - 'switch voice [to] (poppy, prudence, spike, obidiah)'
 - 'whats [is] the time'
+- '(play, pause, shuffle, skip, rewind, back) song'
+- 'play {songname} [by {artist}]'
 
 ## Pre-Installed voices
 - poppy
