@@ -62,9 +62,15 @@ public class MusicCommand implements CommandInterface {
         }
     }
     public static void Skip() {
+        if(!CurrentlyPlaying) {
+            Play();
+        }
         _mpd.getPlayer().playNext();
     }
     public static void Rewind() {
+        if(!CurrentlyPlaying) {
+            Play();
+        }
         _mpd.getPlayer().playPrevious();
     }
 
