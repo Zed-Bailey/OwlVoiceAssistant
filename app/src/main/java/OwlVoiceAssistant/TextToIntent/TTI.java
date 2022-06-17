@@ -51,9 +51,6 @@ public class TTI {
 
         Gson gson = new Gson();
         Command[] parsed = gson.fromJson(content, Command[].class);
-
-        PrintCommand(parsed[0]);
-
         return parsed;
     }
 
