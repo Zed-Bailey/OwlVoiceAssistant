@@ -1,0 +1,12 @@
+[
+  {
+    "name": "musicControl",
+    "speech" : [
+      "$controlaction:action music",
+      "$controlaction:action song"
+    ],
+    "slots" : {
+      "controlaction" : ["pause", "play", "skip", "rewind", "shuffle"]
+    }
+  }
+]
