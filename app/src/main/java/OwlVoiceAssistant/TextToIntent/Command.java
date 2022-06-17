@@ -1,9 +1,6 @@
 package OwlVoiceAssistant.TextToIntent;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 public class Command {
     public String name;
@@ -26,11 +23,10 @@ public class Command {
 
 
     private Intent tryMatch(String spokenText, String phrase) {
-        var inputSplit = spokenText.split(" ");
+        var inputSplit = spokenText.toLowerCase().split(" ");
         Intent parsedIntent = new Intent();
 
-        // System.out.println("spoken text split: " + Arrays.toString(inputSplit)); //DEBUG
-
+        // convert phrase to upper case
         var speechSplit = phrase.split(" ");
         if (inputSplit.length == speechSplit.length) {
             for (int i = 0; i < inputSplit.length; i++) {
@@ -45,17 +41,16 @@ public class Command {
                         parsedIntent.slots.put(slot[1], inputSplit[i]);
                         continue;
                     }
+
                     // get the possible slot values for controlaction
                     var slotValues = this.slots.get(slot[0]);
-
-//                    System.out.println("possible slot matches = " + slotValues); // DEBUG
 
                     // check that the spoken input has a matching input in the slots
                     var slotIndex = slotValues.indexOf(inputSplit[i]);
                     if(slotIndex == -1){
                         return null;
                     }
-                    // System.out.println("Matched slot value = " + slotValues.get(slotIndex)); //DEBUG
+                    // add the parsed slot to the value
                     parsedIntent.slots.put(slot[1], slotValues.get(slotIndex));
                 }
                 else if(!Objects.equals(inputSplit[i], speechSplit[i])) {
