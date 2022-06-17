@@ -5,15 +5,13 @@ import com.google.gson.Gson;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Arrays;
 
 /**
  * A text to intent parser
  */
 public class TTI {
 
-    Command[] commands;
+    private Command[] commands;
 
 
     /**
@@ -24,17 +22,25 @@ public class TTI {
         commands = LoadAndParse(intentFilePath);
     }
 
+    /**
+     * Parse the text to an intent
+     * @param text the spoken text
+     * @return an Intent object. will return null if the intent is unknown or couldn't be parsed
+     */
     public Intent ParseTextToCommand(String text) {
-
         for (Command c : commands) {
             var match = c.Match(text);
             if(match != null)
                 return match;
         }
-
         return null;
     }
 
+    /**
+     * Load the json grammar file and parse it into the appropriate commands
+     * @param path path to the file
+     * @return an array of commands
+     */
     private Command[] LoadAndParse(String path)  {
 
         var filePath = Path.of(path);
@@ -50,8 +56,7 @@ public class TTI {
         }
 
         Gson gson = new Gson();
-        Command[] parsed = gson.fromJson(content, Command[].class);
-        return parsed;
+        return gson.fromJson(content, Command[].class);
     }
 
     private void PrintCommand(Command c) {
