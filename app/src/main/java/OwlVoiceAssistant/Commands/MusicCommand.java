@@ -1,8 +1,7 @@
 package OwlVoiceAssistant.Commands;
 
+import OwlVoiceAssistant.TextToIntent.Intent;
 import org.bff.javampd.server.MPD;
-
-import java.util.Map;
 
 public class MusicCommand implements CommandInterface {
 
@@ -12,10 +11,9 @@ public class MusicCommand implements CommandInterface {
 
 
     @Override
-    public String ExecuteCommand(String intent, Map<String, String> slots) {
-        var action = slots.get("action");
+    public String ExecuteCommand(Intent intent) {
+        var action = intent.slots.get("action");
         var output = "";
-
         switch(action) {
             case "play":
                 Play();
