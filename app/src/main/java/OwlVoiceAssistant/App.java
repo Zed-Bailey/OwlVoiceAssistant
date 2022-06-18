@@ -64,41 +64,11 @@ public class App {
         _tts = InitializeTTS();
         _tti = InitializeTTI(prop.getProperty("commandJson"));
 
-        String rhinoPath = prop.getProperty("rhinoPath");
-        String porcupinePath = prop.getProperty("porcupinePath");
+//        String rhinoPath = prop.getProperty("rhinoPath");
+//        String porcupinePath = prop.getProperty("porcupinePath");
         String picovoiceKey = prop.getProperty("picovoiceKey");
 
         this.intentMap = GenerateIntentCommandMap.MapCommands();
-
-//        PicovoiceWakeWordCallback wakeWordCallback = () -> {
-//            System.out.println("Wake word detected!");
-//            // let user know wake word was detected
-//            //TODO: light up eyes and play notification sound?
-//
-//            // pause music is it's currently playing
-//            if (MusicCommand.CurrentlyPlaying) {
-//                MusicCommand.Pause();
-//            }
-//
-//        };
-//
-//        PicovoiceInferenceCallback inferenceCallback = inference -> {
-//            if (inference.getIsUnderstood()) {
-//                final String intent = inference.getIntent();
-//                final Map<String, String> slots = inference.getSlots();
-//
-//                String speak = this.intentMap.get(intent).ExecuteCommand(intent, slots);
-//                if(speak == null) {
-//                    logger.error("No mapping for the intent: {}, was found in the intentCommandMap. Did you add it in GenerateIntentCommandMap.MapCommands", intent);
-//                    _tts.Speak("Sorry i could not find a command for the intent " + intent);
-//                } else {
-//                    _tts.Speak(speak);
-//                }
-//
-//            } else {
-//                _tts.Speak("Sorry i didnt understand that");
-//            }
-//        };
 
 
         Porcupine porcupine = new Porcupine.Builder()
@@ -106,23 +76,14 @@ public class App {
                 .setBuiltInKeyword(Porcupine.BuiltInKeyword.COMPUTER)
                 .build();
 
+        System.out.println("Porcupine initialized");
+
         Cheetah cheetah = new Cheetah.Builder()
                 .setAccessKey(picovoiceKey)
                 .setLibraryPath(Cheetah.LIBRARY_PATH)
                 .setModelPath(Cheetah.MODEL_PATH)
                 .build();
-
-//        Picovoice picovoice;
-//        picovoice = new Picovoice.Builder()
-//                .setAccessKey(picovoiceKey)
-//                .setKeywordPath(porcupinePath)
-////                .setWakeWordCallback(wakeWordCallback)
-////                .setContextPath(rhinoPath)
-////                .setInferenceCallback(inferenceCallback)
-//                .setPorcupineSensitivity(0.7f)
-//                .build();
-
-//        logger.info("Initialized Picovoice");
+        System.out.println("Cheetah initialized");
 
 
         // get default audio capture device
@@ -180,41 +141,6 @@ public class App {
 
 
         }
-//
-//        // buffers for processing audio
-//        short[] picovoiceBuffer = new short[picovoice.getFrameLength()];
-//        ByteBuffer captureBuffer = ByteBuffer.allocate(picovoice.getFrameLength() * 2);
-//        captureBuffer.order(ByteOrder.LITTLE_ENDIAN);
-//
-//        // get default audio capture device
-//        AudioFormat format = new AudioFormat(16000f, 16, 1, true, false);
-//        DataLine.Info dataLineInfo = new DataLine.Info(TargetDataLine.class, format);
-//        TargetDataLine micDataLine;
-//
-//        micDataLine = (TargetDataLine) AudioSystem.getLine(dataLineInfo);
-//        micDataLine.open(format);
-//
-//        // start audio capture
-//        micDataLine.start();
-//
-//        int numBytesRead;
-//        boolean recordingCancelled = false;
-//        while (!recordingCancelled) {
-//
-//            // read a buffer of audio
-//            numBytesRead = micDataLine.read(captureBuffer.array(), 0, captureBuffer.capacity());
-//
-//            // don't pass to Picovoice if we don't have a full buffer
-//            if (numBytesRead != picovoice.getFrameLength() * 2) {
-//                continue;
-//            }
-//
-//            // copy into 16-bit buffer
-//            captureBuffer.asShortBuffer().get(picovoiceBuffer);
-//
-//            // process with picovoice
-//            picovoice.process(picovoiceBuffer);
-//        }
     }
 
 
@@ -229,17 +155,12 @@ public class App {
 
 
         try(InputStream stream = new FileInputStream(args[0])) {
+
             Properties prop = new Properties();
             prop.load(stream);
-//            var tti = new TTI(prop.getProperty("commandJson"));
-//            var intent = tti.ParseTextToCommand("play music");
-//            // check that intent was parsed
-//            if(intent != null) {
-//                System.out.printf("Intent\n%s\n", intent);
-//            }
+
             App app = new App();
             app.Run(prop);
-
 
         } catch(IOException e) {
             System.err.printf("Failed to stream the properties file!: %s\n", e);
