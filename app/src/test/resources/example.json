@@ -8,5 +8,14 @@
     "slots" : {
       "controlaction" : ["pause", "play", "skip", "rewind", "shuffle"]
     }
+  },
+  {
+    "name": "getWeather",
+    "speech" : [
+      "whats the weather in $*:location",
+      "weather in $*:location"
+    ],
+    "slots" : {}
   }
+
 ]

@@ -77,26 +77,30 @@ application {
 }
 
 
-test {
-    useJUnitPlatform()
+//test {
+//    useJUnitPlatform()
 //    https://blog.mrhaki.com/2014/10/gradle-goodness-show-standard-out-or.html
-    testLogging {
-        // Make sure output from
-        // standard out or error is shown
-        // in Gradle output.
-        showStandardStreams = true
+//    testLogging {
+//        // Make sure output from
+//        // standard out or error is shown
+//        // in Gradle output.
+//        showStandardStreams = true
+//
+//        // Or we use events method:
+//        // events 'standard_out', 'standard_error'
+//
+//        // Or set property events:
+//        // events = ['standard_out', 'standard_error']
+//
+//        // Instead of string values we can
+//        // use enum values:
+//        // events org.gradle.api.tasks.testing.logging.TestLogEvent.STANDARD_OUT,
+//        //        org.gradle.api.tasks.testing.logging.TestLogEvent.STANDARD_ERROR,
+//    }
+//}
 
-        // Or we use events method:
-        // events 'standard_out', 'standard_error'
-
-        // Or set property events:
-        // events = ['standard_out', 'standard_error']
-
-        // Instead of string values we can
-        // use enum values:
-        // events org.gradle.api.tasks.testing.logging.TestLogEvent.STANDARD_OUT,
-        //        org.gradle.api.tasks.testing.logging.TestLogEvent.STANDARD_ERROR,
-    }
+tasks.test {
+    useJUnitPlatform()
 }
 
 

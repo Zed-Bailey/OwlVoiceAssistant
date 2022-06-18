@@ -19,10 +19,17 @@ public class TTITest {
 
     @Test
     void TestCommandIntent() {
-        System.out.println("Test command intent");
         var match = tti.ParseTextToCommand("play music");
         assertNotNull(match);
         assertEquals("musicControl", match.intent);
         assertEquals("play", match.slots.get("action"));
+    }
+
+    @Test
+    void TestCommandWithWildcard() {
+        var match = tti.ParseTextToCommand("weather in melbourne");
+        assertNotNull(match);
+        assertEquals("getWeather", match.intent);
+        assertEquals("melbourne", match.slots.get("location"));
     }
 }

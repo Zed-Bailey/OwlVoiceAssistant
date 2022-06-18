@@ -11,7 +11,7 @@ public class Command {
 
     public Intent Match(String text) {
         for(String speech: speech) {
-            var match =  this.tryMatch(text, speech);
+            var match = this.tryMatch(text, speech);
             if(match != null) {
                 match.intent = this.name;
                 return match;
@@ -25,16 +25,16 @@ public class Command {
 
     private Intent tryMatch(String spokenText, String phrase) {
         var inputSplit = spokenText.toLowerCase().split(" ");
-        Intent parsedIntent = new Intent();
+        Intent parsedIntent = null;
 
-        // convert phrase to upper case
+        // split the phrase up
         var speechSplit = phrase.split(" ");
         if (inputSplit.length == speechSplit.length) {
+            parsedIntent = new Intent();
             for (int i = 0; i < inputSplit.length; i++) {
                 if(speechSplit[i].contains("$")) {
                     // $controlaction:action -> ["controlaction", "action"]
                     var slot = (speechSplit[i].replace("$", "")).split(":");
-                    // System.out.println("slots = " + Arrays.toString(slot)); // DEBUG
 
                     // handle wildcard slot
                     // simply assigns whatever is in the current position in the spoken text to the slot key value
@@ -59,6 +59,7 @@ public class Command {
                 }
             }
         }
+
         return parsedIntent;
     }
 
