@@ -1,11 +1,10 @@
 package OwlVoiceAssistant.Commands;
 
-import java.util.Map;
+import OwlVoiceAssistant.TextToIntent.Intent;
 
-//public class WeatherCommand implements CommandInterface {
-//
-//    @Override
-//    public String ExecuteCommand(String intent, Map<String,String> slots) {
-//        return "";
-//    }
-//}
+public class WeatherCommand implements CommandInterface {
+    @Override
+    public String ExecuteCommand(Intent intent) {
+        return "The weather is sunny in " + intent.slots.get("location");
+    }
+}
