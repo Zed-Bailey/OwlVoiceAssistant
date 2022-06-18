@@ -2,12 +2,18 @@ package OwlVoiceAssistant.Commands;
 
 import OwlVoiceAssistant.TextToIntent.Intent;
 import org.bff.javampd.server.MPD;
+import org.bff.javampd.server.MPDConnectionException;
 
 public class MusicCommand implements CommandInterface {
 
     public static boolean CurrentlyPlaying = false;
 
     private static final MPD _mpd = MPD.builder().build();
+
+
+    public MusicCommand() {
+        _mpd.getStandAloneMonitor().start();
+    }
 
 
     @Override
@@ -63,7 +69,12 @@ public class MusicCommand implements CommandInterface {
         if(!CurrentlyPlaying) {
             Play();
         }
-        _mpd.getPlayer().playNext();
+        try {
+            _mpd.getPlayer().playNext();
+        } catch (MPDConnectionException e) {
+
+            Skip();
+        }
     }
     public static void Rewind() {
         if(!CurrentlyPlaying) {
