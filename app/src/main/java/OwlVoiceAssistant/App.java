@@ -1,16 +1,12 @@
 package OwlVoiceAssistant;
 
 import OwlVoiceAssistant.Commands.CommandInterface;
-import OwlVoiceAssistant.Commands.MusicCommand;
 import OwlVoiceAssistant.TextToIntent.Intent;
 import OwlVoiceAssistant.TextToIntent.TTI;
 import ai.picovoice.cheetah.Cheetah;
 import ai.picovoice.cheetah.CheetahException;
 import ai.picovoice.cheetah.CheetahTranscript;
-import ai.picovoice.picovoice.Picovoice;
 import ai.picovoice.picovoice.PicovoiceException;
-import ai.picovoice.picovoice.PicovoiceInferenceCallback;
-import ai.picovoice.picovoice.PicovoiceWakeWordCallback;
 import ai.picovoice.porcupine.Porcupine;
 import ai.picovoice.porcupine.PorcupineException;
 import org.apache.log4j.PropertyConfigurator;
@@ -56,7 +52,18 @@ public class App {
     }
 
     private void HandleIntent(Intent intent) {
-        String speak = this.intentMap.get(intent.intent).ExecuteCommand(intent);
+        if(intent == null) {
+            _tts.Speak("Sorry i dont understand");
+            return;
+        }
+
+        var command = this.intentMap.get(intent.intent);
+        if(command == null) {
+            _tts.Speak("No mapping for that command");
+            return;
+        }
+
+        _tts.Speak(command.ExecuteCommand(intent));
     }
 
 
@@ -64,11 +71,10 @@ public class App {
         _tts = InitializeTTS();
         _tti = InitializeTTI(prop.getProperty("commandJson"));
 
-//        String rhinoPath = prop.getProperty("rhinoPath");
-//        String porcupinePath = prop.getProperty("porcupinePath");
         String picovoiceKey = prop.getProperty("picovoiceKey");
 
-        this.intentMap = GenerateIntentCommandMap.MapCommands();
+        // generate the mapping for the intent -> Command class
+        this.intentMap = GenerateIntentCommandMap.MapCommands(prop);
 
 
         Porcupine porcupine = new Porcupine.Builder()
@@ -82,6 +88,7 @@ public class App {
                 .setAccessKey(picovoiceKey)
                 .setLibraryPath(Cheetah.LIBRARY_PATH)
                 .setModelPath(Cheetah.MODEL_PATH)
+                .setEndpointDuration(2.5f)
                 .build();
         System.out.println("Cheetah initialized");
 
@@ -118,25 +125,27 @@ public class App {
 
             // copy into 16-bit buffer
             captureBuffer.asShortBuffer().get(audioBuffer);
-
-            // process with porcupine
-            int result = porcupine.process(audioBuffer);
-            if (result >= 0) {
-                System.out.println("Computer wake word detected");
-                awoken = true;
+            if(!awoken) {
+                // process with porcupine
+                int result = porcupine.process(audioBuffer);
+                if (result >= 0) {
+                    System.out.println("Computer wake word detected");
+                    awoken = true;
+                }
             }
+
 
             if(awoken) {
                 CheetahTranscript transcriptObj = cheetah.process(audioBuffer);
                 System.out.print(transcriptObj.getTranscript());
+                System.out.flush();
                 if (transcriptObj.getIsEndpoint()) {
+                    System.out.println();
                     CheetahTranscript endpointTranscriptObj = cheetah.flush();
-//                    System.out.println(endpointTranscriptObj.getTranscript());
                     var intent = _tti.ParseTextToCommand(endpointTranscriptObj.getTranscript());
-
+                    this.HandleIntent(intent);
                     awoken = false;
                 }
-                System.out.flush();
             }
 
 
