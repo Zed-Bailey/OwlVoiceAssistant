@@ -24,7 +24,7 @@ public class Command {
 
 
     private Intent tryMatch(String spokenText, String phrase) {
-        var inputSplit = spokenText.toLowerCase().split(" ");
+        var inputSplit = spokenText.split(" ");
         Intent parsedIntent = null;
 
         // split the phrase up

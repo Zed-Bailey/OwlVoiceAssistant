@@ -1,6 +1,7 @@
 package OwlVoiceAssistant;
 
 import OwlVoiceAssistant.Commands.CommandInterface;
+import OwlVoiceAssistant.Commands.MusicCommand;
 import OwlVoiceAssistant.TextToIntent.Intent;
 import OwlVoiceAssistant.TextToIntent.TTI;
 import ai.picovoice.cheetah.Cheetah;
@@ -53,7 +54,7 @@ public class App {
 
     private void HandleIntent(Intent intent) {
         if(intent == null) {
-            _tts.Speak("Sorry i dont understand");
+            _tts.Speak("Sorry i don't understand");
             return;
         }
 
@@ -112,11 +113,11 @@ public class App {
 
         int numBytesRead;
         boolean awoken = false;
-        while (true) {
 
+        System.out.println("Now listening");
+        while (true) {
             // read a buffer of audio
             numBytesRead = micDataLine.read(captureBuffer.array(), 0, captureBuffer.capacity());
-//            totalBytesCaptured += numBytesRead;
 
             // don't pass to porcupine if we don't have a full buffer
             if (numBytesRead != frameLength * 2) {
@@ -125,31 +126,38 @@ public class App {
 
             // copy into 16-bit buffer
             captureBuffer.asShortBuffer().get(audioBuffer);
+
             if(!awoken) {
                 // process with porcupine
                 int result = porcupine.process(audioBuffer);
                 if (result >= 0) {
                     System.out.println("Computer wake word detected");
                     awoken = true;
+                    // pause music if it was playing, so speech can be understood better
+                    if(MusicCommand.CurrentlyPlaying) {
+                        MusicCommand.Pause();
+                    }
                 }
-            }
-
-
-            if(awoken) {
+            } else {
                 CheetahTranscript transcriptObj = cheetah.process(audioBuffer);
                 System.out.print(transcriptObj.getTranscript());
-                System.out.flush();
+
                 if (transcriptObj.getIsEndpoint()) {
-                    System.out.println();
                     CheetahTranscript endpointTranscriptObj = cheetah.flush();
+                    if(endpointTranscriptObj.getTranscript().equalsIgnoreCase("shutdown")) {
+                        break;
+                    }
                     var intent = _tti.ParseTextToCommand(endpointTranscriptObj.getTranscript());
+                    System.out.println(intent);
                     this.HandleIntent(intent);
                     awoken = false;
                 }
+                System.out.flush();
             }
-
-
         }
+        cheetah.delete();
+        porcupine.delete();
+        System.out.println("....shutting down");
     }
 
 
