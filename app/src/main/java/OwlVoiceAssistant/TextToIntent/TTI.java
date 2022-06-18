@@ -30,8 +30,10 @@ public class TTI {
      * @return an Intent object. will return null if the intent is unknown or couldn't be parsed
      */
     public Intent ParseTextToCommand(String text) {
+        var lowerCase = text.toLowerCase();
+
         for (Command c : commands) {
-            var match = c.Match(text);
+            var match = c.Match(lowerCase);
             if(match != null)
                 return match;
         }
