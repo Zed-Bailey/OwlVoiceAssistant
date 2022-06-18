@@ -56,13 +56,20 @@ public class TTI {
         }
 
         Gson gson = new Gson();
-        return gson.fromJson(content, Command[].class);
+        var parsedCommands = gson.fromJson(content, Command[].class);
+
+        for (var command : parsedCommands) {
+            PrintCommand(command);
+        }
+
+        return parsedCommands;
     }
 
     private void PrintCommand(Command c) {
-        System.out.printf("Command:\n\tname:%s\n", c.name);
+        System.out.printf("loaded command:\n\tname: %s\n", c.name);
         System.out.printf("\tspeech: %s\n", c.speech);
-        c.slots.forEach((s, strings) -> System.out.printf("\tslot: %s : %s\n", s, strings));
+        System.out.println("\tslots:");
+        c.slots.forEach((s, strings) -> System.out.printf("\t\t%s : %s\n", s, strings));
     }
 
 
@@ -73,7 +80,7 @@ public class TTI {
     wildcard slots $*:output
     wildcard slots will simply return whatever word is in that position
 
-    intent = the intent of the command, e.g musicControl or getWeather
+    intent = the intent of the command, e.g. musicControl or getWeather
     speech = array of possible alternatives sayings for this intent
     each speech string can have optional sayings in ()
     each speech saying can also have alternative words in []
@@ -83,7 +90,7 @@ public class TTI {
 
     wildcard slots
     "get weather in $*:location"
-    this will simply return the text at that location eg.
+    this will simply return the text at that location e.g.
     "get weather in melbourne" will return
     {"intent": "getWeather", "slots" : {"location": "melbourne"}}
     alternatively had I said something else instead of melbourne then that would've been returned
