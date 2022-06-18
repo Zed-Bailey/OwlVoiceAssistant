@@ -13,7 +13,8 @@
     "name": "getWeather",
     "speech" : [
       "whats the weather in $*:location",
-      "weather in $*:location"
+      "weather in $*:location",
+      "get weather in $*:location"
     ],
     "slots" : {}
   }

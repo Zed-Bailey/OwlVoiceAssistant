@@ -1,6 +1,8 @@
 package OwlVoiceAssistant.TextToIntent;
 
 import com.google.gson.Gson;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -11,8 +13,8 @@ import java.nio.file.Path;
  */
 public class TTI {
 
-    private Command[] commands;
-
+    private final Command[] commands;
+    private static final Logger logger = LogManager.getLogger(TTI.class);
 
     /**
      *
@@ -48,10 +50,12 @@ public class TTI {
         try {
             content = Files.readString(filePath);
         }catch (IOException e) {
-            e.printStackTrace();
+            logger.fatal(e);
             System.exit(1);
         }
+
         if(content == null) {
+            logger.fatal("Failed to load json command file: " + path);
             System.exit(1);
         }
 
@@ -65,6 +69,10 @@ public class TTI {
         return parsedCommands;
     }
 
+    /**
+     * Pretty prints a command to the console
+     * @param c the command to print
+     */
     private void PrintCommand(Command c) {
         System.out.printf("loaded command:\n\tname: %s\n", c.name);
         System.out.printf("\tspeech: %s\n", c.speech);
@@ -75,7 +83,6 @@ public class TTI {
 
 
     /*
-
 
     wildcard slots $*:output
     wildcard slots will simply return whatever word is in that position
@@ -94,10 +101,6 @@ public class TTI {
     "get weather in melbourne" will return
     {"intent": "getWeather", "slots" : {"location": "melbourne"}}
     alternatively had I said something else instead of melbourne then that would've been returned
-
-
-
-
 
      */
 }
