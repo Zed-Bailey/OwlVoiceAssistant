@@ -2,6 +2,7 @@ package OwlVoiceAssistant.TextToIntent;
 
 import java.util.*;
 
+// TODO: find a better name for this class
 public class Command {
     public String name;
     public ArrayList<String> speech;
