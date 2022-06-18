@@ -13,6 +13,7 @@ Create a configuration.properties file with the following key value pairs define
 rhinoPath={path to rhino .rhn intents file}
 porcupinePath={path to .ppn wake word file}
 picovoiceKey={your picovoice key}
+commandJson={path to grammar json file}
 ```
 you can then run the application with
 `java -jar app.jar configuration.properties`
@@ -54,26 +55,3 @@ pass in a config file via a cli command containing various keys and settings
 https://github.com/marytts/gradle-marytts-voicebuilding-plugin
 
 samuel l jackson
-
-
-## resources and ideas
-
-https://medium.com/picovoice/prioritizing-privacy-add-offline-speech-recognition-to-a-java-application-1c864574fb7e
-https://github.com/Picovoice/picovoice/tree/master/sdk/java
-https://github.com/marytts/marytts
-
-
-
-use rhino to listen for key intent words
-for commands where more information is needed use a 2 step process
-1. find intent in spoken text
-2. pass over to leopard where it will listen from the microphone and parse what's spoken to text
-   returned text can then be parsed an executed
-
-eg.
-- 'Hey owl play song'
-- response: 'ok what do you want me to play? '
-- pass over to leopard
-- 'play {song name} by {artist}'
-
-[leopard mic demo github](https://github.com/Picovoice/leopard/blob/master/demo/java/src/ai/picovoice/leoparddemo/MicDemo.java)
