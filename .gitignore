@@ -6,3 +6,4 @@ build
 picovoicekey.txt
 configuration.properties
 app/log/
+app/model/
