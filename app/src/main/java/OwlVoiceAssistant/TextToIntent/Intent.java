@@ -1,7 +1,6 @@
 package OwlVoiceAssistant.TextToIntent;
 
 import java.util.HashMap;
-import java.util.Map;
 
 public class Intent {
     public String intent;

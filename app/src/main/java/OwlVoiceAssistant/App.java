@@ -21,6 +21,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Properties;
 
 public class App {
@@ -70,14 +71,21 @@ public class App {
 
     public void Run (Properties prop) throws LineUnavailableException, IOException {
         _tts = InitializeTTS();
+        System.out.println("Initialized text to speech");
+
         _tti = InitializeTTI(prop.getProperty("commandJson"));
+        System.out.println("Initialized text to intent");
 
         String wakeWord = prop.getProperty("wakeWord");
+        System.out.println("Using wake word: " + wakeWord);
 
         // generate the mapping for the intent -> Command class
         this.intentMap = GenerateIntentCommandMap.MapCommands(prop);
 
         LibVosk.setLogLevel(LogLevel.DEBUG);
+
+        // answer to this question is the basis of the vosk microphone listening
+        // https://stackoverflow.com/questions/68401284/use-the-microphone-in-java-for-speech-recognition-with-vosk
 
         AudioFormat format = new AudioFormat(AudioFormat.Encoding.PCM_SIGNED, 60000, 16, 2, 4, 44100, false);
         DataLine.Info info = new DataLine.Info(TargetDataLine.class, format);
@@ -87,8 +95,6 @@ public class App {
             try {
 
                 recognizer.setMaxAlternatives(1);
-                recognizer.setWords(true);
-                recognizer.setPartialWords(true);
 
                 microphone = (TargetDataLine) AudioSystem.getLine(info);
                 microphone.open(format);
@@ -98,8 +104,10 @@ public class App {
                 int numBytesRead;
                 int CHUNK_SIZE = 1024;
                 System.out.println("Now listening");
+
                 byte[] b = new byte[4096];
                 boolean shutdown = false;
+                boolean awoken = false;
 
                 while (!shutdown) {
                     numBytesRead = microphone.read(b, 0, CHUNK_SIZE);
@@ -108,17 +116,27 @@ public class App {
 
                     if (recognizer.acceptWaveForm(b, numBytesRead)) {
                         var input = recognizer.getFinalResult();
-                        // parse the json that vosk outputs
+
+                        // parse the json string that vosk outputs
                         Any any = JsonIterator.deserialize(input);
                         var stt = any.get("alternatives", 0, "text").toString();
-                        System.out.println(stt);
+
                         if(stt.contains(wakeWord)) {
                             stt = stt.replace(wakeWord, "").trim();
                             System.out.println(stt);
                             HandleIntent(_tti.ParseTextToCommand(stt));
+
+                            // reset wake word status
+                            awoken = false;
+                        }
+                    } else {
+                        var partial = JsonIterator.deserialize(recognizer.getPartialResult()).get("partial").toString();
+                        // check if the partial word matches the wake word, if it does
+                        if(Objects.equals(partial, wakeWord) && !awoken) {
+                            awoken = true;
+                            // TODO: do any actions here on wake word detection
                         }
                     }
-
                 }
 
                 microphone.close();
@@ -136,8 +154,6 @@ public class App {
         }
 
         PropertyConfigurator.configure("log4j2.xml");
-
-
 
         try(InputStream stream = new FileInputStream(args[0])) {
 
