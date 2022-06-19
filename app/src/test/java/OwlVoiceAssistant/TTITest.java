@@ -19,7 +19,7 @@ public class TTITest {
 
     @Test
     void TestCommandIntent() {
-        var match = tti.ParseTextToCommand("PLAY MUSIC");
+        var match = tti.ParseTextToCommand("play music");
         assertNotNull(match);
         assertEquals("musicControl", match.intent);
         assertEquals("play", match.slots.get("action"));
@@ -27,7 +27,7 @@ public class TTITest {
 
     @Test
     void TestCommandWithWildcard() {
-        var match = tti.ParseTextToCommand("WEATHER IN MELBOURNE");
+        var match = tti.ParseTextToCommand("weather in melbourne");
         assertNotNull(match);
         assertEquals("getWeather", match.intent);
         assertEquals("melbourne", match.slots.get("location"));
