@@ -2,210 +2,172 @@ package OwlVoiceAssistant;
 
 import OwlVoiceAssistant.Commands.CommandInterface;
 import OwlVoiceAssistant.Commands.MusicCommand;
-import ai.picovoice.picovoice.Picovoice;
-import ai.picovoice.picovoice.PicovoiceException;
-import ai.picovoice.picovoice.PicovoiceInferenceCallback;
-import ai.picovoice.picovoice.PicovoiceWakeWordCallback;
-import ai.picovoice.porcupine.Porcupine;
-import org.apache.commons.io.IOUtils;
+import OwlVoiceAssistant.TextToIntent.Intent;
+import OwlVoiceAssistant.TextToIntent.TTI;
+import com.jsoniter.JsonIterator;
+import com.jsoniter.any.Any;
 import org.apache.log4j.PropertyConfigurator;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import org.vosk.LibVosk;
+import org.vosk.LogLevel;
+import org.vosk.Model;
+import org.vosk.Recognizer;
+
 import javax.sound.sampled.*;
+import java.io.ByteArrayOutputStream;
+import java.io.FileInputStream;
 import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-import java.nio.charset.StandardCharsets;
+import java.io.InputStream;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Properties;
 
 public class App {
 
-    private static final Logger logger = LogManager.getLogger();
+    private static final Logger logger = LogManager.getLogger(App.class);
     private TTS _tts;
+    private TTI _tti;
 
     private Map<String, CommandInterface> intentMap;
-
-
-
-    // FIXME? pass these paths through main function rather then hardcoding them, have them be passed as cli arguments?
-    private final String porcupineKeyword = "WakeWord.ppn";
-    private final String rhinoContextPath = "RhinoIntents.rhn";
-    private final String picovoiceKeyPath = "picovoicekey.txt";
-
 
     /**
      * Initialize the text to speech class
      * if this fails to initialize then the application will exit with ExitCode = 1
      */
-    public void InitializeTTS() {
+    private TTS InitializeTTS() {
         var voice = "dfki-prudence-hsmm";
-        _tts = new TTS(voice);
+        var tts = new TTS(voice);
         try {
-            _tts.Configure();
+            tts.Configure();
             logger.info("Initialized Text to speech with {}", voice);
         } catch (Exception e) {
             logger.fatal("Failed to initialize the text to speech object: exception = {}", e.getMessage());
             System.exit(1);
         }
+        return tts;
     }
 
-    /**
-     * Read the file that stores the picovoice key
-     * if the file is not found then the system will exit and a fatal log will be created.
-     * @param path the file path to read
-     * @return a string containing the  key
-     */
-    public String ReadPicoKeyFile(String path) {
-        try {
-            var inputStream = this.getClass()
-                    .getClassLoader()
-                    .getResourceAsStream(path);
-            if(inputStream == null) throw new NullPointerException("Input stream was null while trying to read picovoice key file path");
-
-            return IOUtils.toString(inputStream, StandardCharsets.UTF_8);
-
-        } catch(NullPointerException e) {
-            logger.fatal("failed to load in key path: {}\nexception: {}", path, e);
-            System.exit(1);
-        } catch (IOException e) {
-            logger.fatal("failed to read key file path = {}\nexception: {}", path, e);
-            System.exit(1);
-        }
-
-        return "";
+    private TTI InitializeTTI(String grammarPath) {
+        return new TTI(grammarPath);
     }
 
-    public void Run () throws PicovoiceException, LineUnavailableException {
-        InitializeTTS();
-        logger.info("hello");
-        this.intentMap = GenerateIntentCommandMap.MapCommands();
-
-        var rhinoPath = this.getClass()
-                .getClassLoader()
-                .getResource(this.rhinoContextPath)
-                .getPath();
-
-        var wakeWordPath = this.getClass()
-                .getClassLoader()
-                .getResource(this.porcupineKeyword)
-                .getPath();
-
-        // set an inbuilt wake word paths
-//        final Porcupine.BuiltInKeyword builtInKeyword = Porcupine.BuiltInKeyword.valueOf("JARVIS");
-//        wakeWordPath = Porcupine.BUILT_IN_KEYWORD_PATHS.get(builtInKeyword);
-
-        if(rhinoPath == null) {
-            throw new IllegalArgumentException("Could not find rhino context file: " + this.rhinoContextPath + " in the class path");
+    private void HandleIntent(Intent intent) {
+        if(intent == null) {
+            _tts.Speak("Sorry i don't understand");
+            return;
         }
 
-        if (wakeWordPath == null) {
-            throw new IllegalArgumentException("Could not find porcupine keyword file: " + this.porcupineKeyword + " in the class path");
+        var command = this.intentMap.get(intent.intent);
+        if(command == null) {
+            _tts.Speak("No mapping for that command");
+            return;
         }
 
-        var picovoicekey = ReadPicoKeyFile(this.picovoiceKeyPath);
+        _tts.Speak(command.ExecuteCommand(intent));
+    }
 
 
-        PicovoiceWakeWordCallback wakeWordCallback = () -> {
-            System.out.println("Wake word detected!");
-            // let user know wake word was detected
-            //TODO: light up eyes and play notification sound?
+    public void Run (Properties prop) throws LineUnavailableException, IOException {
+        _tts = InitializeTTS();
+        System.out.println("Initialized text to speech");
 
-            // pause music is it's currently playing
-            if (MusicCommand.CurrentlyPlaying) {
-                MusicCommand.Pause();
-            }
+        _tti = InitializeTTI(prop.getProperty("commandJson"));
+        System.out.println("Initialized text to intent");
 
-        };
+        String wakeWord = prop.getProperty("wakeWord");
+        System.out.println("Using wake word: " + wakeWord);
 
-        PicovoiceInferenceCallback inferenceCallback = inference -> {
-            if (inference.getIsUnderstood()) {
-                final String intent = inference.getIntent();
-                final Map<String, String> slots = inference.getSlots();
+        // generate the mapping for the intent -> Command class
+        this.intentMap = GenerateIntentCommandMap.MapCommands(prop);
 
-//                System.out.println(intent);
-//                slots.forEach((key, value) -> System.out.println("\t" + key + ":" + value));
+        LibVosk.setLogLevel(LogLevel.DEBUG);
 
-                String speak = this.intentMap.get(intent).ExecuteCommand(intent, slots);
-                if(speak == null) {
-                    logger.error("No mapping for the intent: {}, was found in the intentCommandMap. Did you add it in GenerateIntentCommandMap.MapCommands", intent);
-                    _tts.Speak("Sorry i could not find a command for the intent " + intent);
-                } else {
-                    _tts.Speak(speak);
+        // answer to this question is the basis of the vosk microphone listening
+        // https://stackoverflow.com/questions/68401284/use-the-microphone-in-java-for-speech-recognition-with-vosk
+
+        AudioFormat format = new AudioFormat(AudioFormat.Encoding.PCM_SIGNED, 60000, 16, 2, 4, 44100, false);
+        DataLine.Info info = new DataLine.Info(TargetDataLine.class, format);
+        TargetDataLine microphone;
+        try (Model model = new Model("model");
+             Recognizer recognizer = new Recognizer(model, 120000)) {
+            try {
+
+                recognizer.setMaxAlternatives(1);
+
+                microphone = (TargetDataLine) AudioSystem.getLine(info);
+                microphone.open(format);
+                microphone.start();
+
+                ByteArrayOutputStream out = new ByteArrayOutputStream();
+                int numBytesRead;
+                int CHUNK_SIZE = 1024;
+                System.out.println("Now listening");
+
+                byte[] b = new byte[4096];
+                boolean shutdown = false;
+                boolean awoken = false;
+
+                while (!shutdown) {
+                    numBytesRead = microphone.read(b, 0, CHUNK_SIZE);
+
+                    out.write(b, 0, numBytesRead);
+
+                    if (recognizer.acceptWaveForm(b, numBytesRead)) {
+                        var input = recognizer.getFinalResult();
+
+                        // parse the json string that vosk outputs
+                        Any any = JsonIterator.deserialize(input);
+                        var stt = any.get("alternatives", 0, "text").toString();
+
+                        if(stt.contains(wakeWord)) {
+                            stt = stt.replace(wakeWord, "").trim();
+                            System.out.println(stt);
+                            HandleIntent(_tti.ParseTextToCommand(stt));
+
+                            // reset wake word status
+                            awoken = false;
+                        }
+                    } else {
+                        var partial = JsonIterator.deserialize(recognizer.getPartialResult()).get("partial").toString();
+                        // check if the partial word matches the wake word, if it does
+                        if(Objects.equals(partial, wakeWord) && !awoken) {
+                            awoken = true;
+                            // TODO: do any actions here on wake word detection
+                        }
+                    }
                 }
 
-            } else {
-                _tts.Speak("I have no idea what you want me to do!");
+                microphone.close();
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-        };
-
-
-
-
-        Picovoice picovoice;
-        picovoice = new Picovoice.Builder()
-                // TODO read cli arguments to get model paths and key rather then hard coding it in
-                .setAccessKey(picovoicekey)
-                .setKeywordPath(wakeWordPath)
-                .setWakeWordCallback(wakeWordCallback)
-                .setContextPath(rhinoPath)
-                .setInferenceCallback(inferenceCallback)
-                .setPorcupineSensitivity(0.7f)
-                .build();
-
-        logger.info("Initialized Picovoice");
-
-        // buffers for processing audio
-        short[] picovoiceBuffer = new short[picovoice.getFrameLength()];
-        ByteBuffer captureBuffer = ByteBuffer.allocate(picovoice.getFrameLength() * 2);
-        captureBuffer.order(ByteOrder.LITTLE_ENDIAN);
-
-        // get default audio capture device
-        AudioFormat format = new AudioFormat(16000f, 16, 1, true, false);
-        DataLine.Info dataLineInfo = new DataLine.Info(TargetDataLine.class, format);
-        TargetDataLine micDataLine;
-
-        micDataLine = (TargetDataLine) AudioSystem.getLine(dataLineInfo);
-        micDataLine.open(format);
-
-        // start audio capture
-        micDataLine.start();
-
-        int numBytesRead;
-        boolean recordingCancelled = false;
-        while (!recordingCancelled) {
-
-            // read a buffer of audio
-            numBytesRead = micDataLine.read(captureBuffer.array(), 0, captureBuffer.capacity());
-
-            // don't pass to Picovoice if we don't have a full buffer
-            if (numBytesRead != picovoice.getFrameLength() * 2) {
-                continue;
-            }
-
-            // copy into 16-bit buffer
-            captureBuffer.asShortBuffer().get(picovoiceBuffer);
-
-            // process with picovoice
-            picovoice.process(picovoiceBuffer);
         }
     }
 
 
     public static void main(String[] args) {
-        // print the default  wake commands that can be added
-//        System.out.println("Default wake commands");
-//        Porcupine.BUILT_IN_KEYWORD_PATHS.forEach((key,value) -> System.out.println(key + ":" + value));
-//        System.out.println("-----\n");
+        if(args.length != 1) {
+            System.out.println("Path to properties file is required");
+            return;
+        }
+
         PropertyConfigurator.configure("log4j2.xml");
-        App app = new App();
-        try {
-            app.Run();
-        }
-        catch(PicovoiceException | LineUnavailableException e) {
-            logger.fatal("Failed to initialize picovoice: exception = {}", e.getMessage());
-        }
 
+        try(InputStream stream = new FileInputStream(args[0])) {
 
+            Properties prop = new Properties();
+            prop.load(stream);
+
+            App app = new App();
+            app.Run(prop);
+
+        } catch(IOException e) {
+            System.err.printf("Failed to get the properties file!: %s\n", e);
+            System.exit(1);
+        } catch (LineUnavailableException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

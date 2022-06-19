@@ -1,8 +1,8 @@
 package OwlVoiceAssistant.Commands;
 
+import OwlVoiceAssistant.TextToIntent.Intent;
 import org.bff.javampd.server.MPD;
-
-import java.util.Map;
+import org.bff.javampd.server.MPDConnectionException;
 
 public class MusicCommand implements CommandInterface {
 
@@ -11,11 +11,15 @@ public class MusicCommand implements CommandInterface {
     private static final MPD _mpd = MPD.builder().build();
 
 
-    @Override
-    public String ExecuteCommand(String intent, Map<String, String> slots) {
-        var action = slots.get("action");
-        var output = "";
+    public MusicCommand() {
+        _mpd.getStandAloneMonitor().start();
+    }
 
+
+    @Override
+    public String ExecuteCommand(Intent intent) {
+        var action = intent.slots.get("action");
+        var output = "";
         switch(action) {
             case "play":
                 Play();
@@ -65,7 +69,12 @@ public class MusicCommand implements CommandInterface {
         if(!CurrentlyPlaying) {
             Play();
         }
-        _mpd.getPlayer().playNext();
+        try {
+            _mpd.getPlayer().playNext();
+        } catch (MPDConnectionException e) {
+
+            Skip();
+        }
     }
     public static void Rewind() {
         if(!CurrentlyPlaying) {

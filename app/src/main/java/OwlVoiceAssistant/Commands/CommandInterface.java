@@ -1,5 +1,7 @@
 package OwlVoiceAssistant.Commands;
 
+import OwlVoiceAssistant.TextToIntent.Intent;
+
 import java.util.Map;
 
 /**
@@ -12,5 +14,5 @@ public interface CommandInterface {
      * this method will be called when the voice command is uttered
      * @return A string that will be synthesized and spoken
      */
-    String ExecuteCommand(String intent, Map<String,String> slots);
+    String ExecuteCommand(Intent intent);
 }
