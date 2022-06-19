@@ -4,24 +4,16 @@ import OwlVoiceAssistant.Commands.CommandInterface;
 import OwlVoiceAssistant.Commands.MusicCommand;
 import OwlVoiceAssistant.TextToIntent.Intent;
 import OwlVoiceAssistant.TextToIntent.TTI;
-import com.jsoniter.JsonIterator;
-import com.jsoniter.any.Any;
+
 import org.apache.log4j.PropertyConfigurator;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import org.vosk.LibVosk;
-import org.vosk.LogLevel;
-import org.vosk.Model;
-import org.vosk.Recognizer;
-
 import javax.sound.sampled.*;
-import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Properties;
 
 public class App {
@@ -82,7 +74,6 @@ public class App {
         // do something here when intent has been parsed
         var listener = new SpeechListener(wakeWord, tti)
                 .setWakeWordCallback(() -> {
-                    // do something here when wake word detected
                     // pause music if playing
                     if(MusicCommand.CurrentlyPlaying) {
                         MusicCommand.Pause();
