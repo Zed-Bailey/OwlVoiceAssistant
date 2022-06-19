@@ -22,12 +22,9 @@ you can then run the application with
 `java -jar app.jar configuration.properties`
 
 ## Commands
-commands in parentheses `()` are possible options for the command
-e.g. `(pause, play) music` can be evaluated as `play music` or `pause music`
 
-commands in square brackets `[]` are optional words that can be said
-
-- '(play, pause, shuffle, skip, rewind, back) music'
+TODO: add more docs here
+TODO: add google command. e.g. `computer google how many punds in an ounce`
 
 ### Commands on the roadmap
 - 'tell me a joke'
