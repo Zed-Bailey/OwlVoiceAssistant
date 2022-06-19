@@ -23,16 +23,11 @@ you can then run the application with
 
 ## Commands
 
+existing commands can be found in `app/Grammar.json`
+
 TODO: add more docs here
 TODO: add google command. e.g. `computer google how many punds in an ounce`
 
-### Commands on the roadmap
-- 'tell me a joke'
-- 'tell me a dark joke'
-- 'switch voice [to] (poppy, prudence, spike, obidiah)'
-- 'whats [is] the time'
-- '(play, pause, shuffle, skip, rewind, back) song'
-- 'play {songname} [by {artist}]'
 
 ## Pre-Installed voices
 - poppy
@@ -46,12 +41,11 @@ then copied from their install location to this projects `lib/voices` folder
 
 ## Roadmap
 
-pass in a config file via a cli command containing various keys and settings
-- mpd url,port, password if one.
-- picovoice sdk key
+- ability for assistant to change voice
+- more integrations
+- deployment to a raspberry pi
+
 
 ## Custom voice
 
 https://github.com/marytts/gradle-marytts-voicebuilding-plugin
-
-samuel l jackson
