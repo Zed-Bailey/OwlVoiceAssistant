@@ -97,9 +97,10 @@ public class App {
                 ByteArrayOutputStream out = new ByteArrayOutputStream();
                 int numBytesRead;
                 int CHUNK_SIZE = 1024;
-
+                System.out.println("Now listening");
                 byte[] b = new byte[4096];
                 boolean shutdown = false;
+
                 while (!shutdown) {
                     numBytesRead = microphone.read(b, 0, CHUNK_SIZE);
 
@@ -111,6 +112,11 @@ public class App {
                         Any any = JsonIterator.deserialize(input);
                         var stt = any.get("alternatives", 0, "text").toString();
                         System.out.println(stt);
+                        if(stt.contains(wakeWord)) {
+                            stt = stt.replace(wakeWord, "").trim();
+                            System.out.println(stt);
+                            HandleIntent(_tti.ParseTextToCommand(stt));
+                        }
                     }
 
                 }
