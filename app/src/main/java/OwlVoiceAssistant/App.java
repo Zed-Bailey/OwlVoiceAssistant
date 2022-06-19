@@ -76,11 +76,10 @@ public class App {
     }
 
 
-    public void Run (Properties prop) throws PorcupineException, CheetahException, LineUnavailableException, IOException {
+    public void Run (Properties prop) throws LineUnavailableException, IOException {
         _tts = InitializeTTS();
         _tti = InitializeTTI(prop.getProperty("commandJson"));
 
-        String picovoiceKey = prop.getProperty("picovoiceKey");
 
         // generate the mapping for the intent -> Command class
         this.intentMap = GenerateIntentCommandMap.MapCommands(prop);
@@ -152,11 +151,6 @@ public class App {
         } catch(IOException e) {
             System.err.printf("Failed to stream the properties file!: %s\n", e);
             System.exit(1);
-        }
-        catch(PorcupineException e) {
-            logger.fatal("Failed to initialize picovoice: exception = {}", e.getMessage());
-        } catch (CheetahException e) {
-            logger.fatal("Failed to initialize cheetah: exception = {}", e.getMessage());
         } catch (LineUnavailableException e) {
             throw new RuntimeException(e);
         }

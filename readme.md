@@ -6,13 +6,13 @@ An offline privacy first voice assistant
 - mpd (Music player daemon) setup and listening on localhost:6600
   - in the future this will be configured with a config file
 
+download a vosk model from [here](https://alphacephei.com/vosk/models) and unzip it. rename folder to model and place it in the `app/` directory
+
+
 
 ## Running
 Create a configuration.properties file with the following key value pairs defined
 ```properties
-rhinoPath={path to rhino .rhn intents file}
-porcupinePath={path to .ppn wake word file}
-picovoiceKey={your picovoice key}
 commandJson={path to grammar json file}
 ```
 you can then run the application with
