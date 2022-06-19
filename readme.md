@@ -14,7 +14,10 @@ download a vosk model from [here](https://alphacephei.com/vosk/models) and unzip
 Create a configuration.properties file with the following key value pairs defined
 ```properties
 commandJson={path to grammar json file}
+wakeWord=computer
 ```
+wake word can be any word you want
+
 you can then run the application with
 `java -jar app.jar configuration.properties`
 

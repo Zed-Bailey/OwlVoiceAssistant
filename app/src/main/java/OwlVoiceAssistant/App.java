@@ -4,18 +4,12 @@ import OwlVoiceAssistant.Commands.CommandInterface;
 import OwlVoiceAssistant.Commands.MusicCommand;
 import OwlVoiceAssistant.TextToIntent.Intent;
 import OwlVoiceAssistant.TextToIntent.TTI;
-import ai.picovoice.cheetah.Cheetah;
-import ai.picovoice.cheetah.CheetahException;
-import ai.picovoice.cheetah.CheetahTranscript;
-import ai.picovoice.picovoice.PicovoiceException;
-import ai.picovoice.porcupine.Porcupine;
-import ai.picovoice.porcupine.PorcupineException;
-import com.google.gson.JsonObject;
 import com.jsoniter.JsonIterator;
 import com.jsoniter.any.Any;
 import org.apache.log4j.PropertyConfigurator;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
 import org.vosk.LibVosk;
 import org.vosk.LogLevel;
 import org.vosk.Model;
@@ -26,8 +20,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import java.util.Map;
 import java.util.Properties;
 
@@ -80,6 +72,7 @@ public class App {
         _tts = InitializeTTS();
         _tti = InitializeTTI(prop.getProperty("commandJson"));
 
+        String wakeWord = prop.getProperty("wakeWord");
 
         // generate the mapping for the intent -> Command class
         this.intentMap = GenerateIntentCommandMap.MapCommands(prop);
@@ -149,7 +142,7 @@ public class App {
             app.Run(prop);
 
         } catch(IOException e) {
-            System.err.printf("Failed to stream the properties file!: %s\n", e);
+            System.err.printf("Failed to get the properties file!: %s\n", e);
             System.exit(1);
         } catch (LineUnavailableException e) {
             throw new RuntimeException(e);
