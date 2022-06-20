@@ -70,7 +70,7 @@ public class SpeechListener {
                 ByteArrayOutputStream out = new ByteArrayOutputStream();
                 int numBytesRead;
                 int CHUNK_SIZE = 1024;
-                System.out.println("Now listening");
+                System.out.println("[INFO] Now listening");
 
                 byte[] b = new byte[4096];
                 boolean shutdown = false;
