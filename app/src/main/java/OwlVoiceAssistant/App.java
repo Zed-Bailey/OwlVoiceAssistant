@@ -72,22 +72,15 @@ public class App {
         String wakeWord = prop.getProperty("wakeWord");
         System.out.println("Using wake word: " + wakeWord);
 
-        AtomicBoolean musicWasPlaying = new AtomicBoolean(false);
+
         // do something here when intent has been parsed
         var listener = new SpeechListener(wakeWord, tti)
                 .setWakeWordCallback(() -> {
                     // pause music if playing
                     if(MusicCommand.CurrentlyPlaying) {
                         MusicCommand.Pause();
-                        musicWasPlaying.set(true);
                     }
-                }).setIntentCallBack(intent -> {
-                    HandleIntent(intent);
-                    if(musicWasPlaying.get()) {
-                        MusicCommand.Play();
-                        musicWasPlaying.set(false);
-                    }
-                });
+                }).setIntentCallBack(this::HandleIntent);
 
         // generate the mapping for the intent -> Command class
         this.intentMap = GenerateIntentCommandMap.MapCommands(prop);
