@@ -7,3 +7,4 @@ picovoicekey.txt
 configuration.properties
 app/log/
 app/model/
+app/native-build/

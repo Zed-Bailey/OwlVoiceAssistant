@@ -6,8 +6,23 @@ An offline privacy first voice assistant
 - mpd (Music player daemon) setup and listening on localhost:6600
   - in the future this will be configured with a config file
 
+## Using a different speech to text model
 download a vosk model from [here](https://alphacephei.com/vosk/models) and unzip it. rename folder to model and place it in the `app/` directory
 
+
+## Building
+assuming you have graalvm 22.1.0 for jdk 17
+and graalvm `native-image` component installed
+```
+# from root project directory
+./gradlew shadowJar
+
+# build a native executable 
+native-image -jar app/build/libs/OwlVoiceAssistant-0.1.0-all.jar voice-assistant
+
+# run executable
+./voice-assistant <path to configuration.properties>
+```
 
 
 ## Running
