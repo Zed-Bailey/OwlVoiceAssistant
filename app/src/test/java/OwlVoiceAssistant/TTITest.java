@@ -32,4 +32,12 @@ public class TTITest {
         assertEquals("getWeather", match.intent);
         assertEquals("melbourne", match.slots.get("location"));
     }
+
+    @Test
+    void TestCommandWithRestOfSentenceOperator() {
+        var match = tti.ParseTextToCommand("google how many kilos in a pound");
+        assertNotNull(match);
+        assertEquals("google", match.intent);
+        assertEquals("how many kilos in a pound", match.slots.get("search"));
+    }
 }
