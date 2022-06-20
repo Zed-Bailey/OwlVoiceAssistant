@@ -28,6 +28,49 @@ existing commands can be found in `app/Grammar.json`
 TODO: add more docs here
 TODO: add google command. e.g. `computer google how many punds in an ounce`
 
+creating your own command
+example weather grammar
+```json
+{
+    "name": "getWeather",
+    "speech" : [
+      "what's the weather in $*:location",
+      "weather in $*:location",
+      "get weather in $*:location",
+      "get the weather in $*:location"
+    ],
+    "slots" : {}
+}
+```
+`$*:location` is a wildcard slot and will return whatever value is in that position
+"weather in melbourne" will return the intent `{intent: getWeather, slots {location = "melbourne"}}`
+if you want to match against a set list of values you can use slots
+```json
+{
+    "name": "musicControl",
+    "speech" : [
+      "$controlaction:action music",
+      "$controlaction:action song"
+    ],
+    "slots" : {
+      "controlaction" : ["pause", "play", "skip", "rewind", "shuffle"]
+    }
+  }
+```
+here `$controlaction:action` will map the spoken value to one of the possible values in the controlaction array
+"play music" will return an intent `{intent: musicControl, slots {action = "play"}}`
+
+to return the rest of the sentence `$>:variable` can be used
+```json
+{
+    "name": "google",
+    "speech" : [
+      "google $>:search"
+    ],
+    "slots" : {}
+  }
+```
+"google how many kilos in a pound" will return an intent `{intent: google, slots {search = "how many kilos in a pound"}}`
 
 ## Pre-Installed voices
 - poppy
