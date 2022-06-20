@@ -18,6 +18,13 @@
       "get the weather in $*:location"
     ],
     "slots" : {}
+  },
+  {
+    "name": "google",
+    "speech" : [
+      "google $>:search"
+    ],
+    "slots" : {}
   }
 
 ]

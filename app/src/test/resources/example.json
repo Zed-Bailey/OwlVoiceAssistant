@@ -12,8 +12,17 @@
   {
     "name": "getWeather",
     "speech" : [
-      "whats the weather in $*:location",
-      "weather in $*:location"
+      "what's the weather in $*:location",
+      "weather in $*:location",
+      "get weather in $*:location",
+      "get the weather in $*:location"
+    ],
+    "slots" : {}
+  },
+  {
+    "name": "google",
+    "speech" : [
+      "google $>:search"
     ],
     "slots" : {}
   }
