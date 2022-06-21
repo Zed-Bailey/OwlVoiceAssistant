@@ -17,7 +17,7 @@ public class GenerateIntentCommandMap {
     public static Map<String, CommandInterface> MapCommands(Properties properties) {
         HashMap<String, CommandInterface> map = new HashMap<>();
         map.put("musicControl", new MusicCommand());
-        map.put("getWeather", new WeatherCommand());
+        map.put("getWeather", new WeatherCommand(properties.getProperty("openweather_apikey")));
         return map;
     }
 }

@@ -30,6 +30,7 @@ Create a configuration.properties file with the following key value pairs define
 ```properties
 commandJson={path to grammar json file}
 wakeWord=computer
+openweather_apikey={api key for openweathermap}
 ```
 wake word can be any word you want
 
