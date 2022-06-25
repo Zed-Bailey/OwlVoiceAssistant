@@ -1,5 +1,6 @@
 package OwlVoiceAssistant.Commands;
 
+import OwlVoiceAssistant.Services.ApiService;
 import OwlVoiceAssistant.TextToIntent.Intent;
 import com.jsoniter.JsonIterator;
 import okhttp3.*;
@@ -10,8 +11,6 @@ import java.io.IOException;
 public class WeatherCommand implements CommandInterface {
 
     private final String _apiKey;
-    private final String baseUrl = "https://api.openweathermap.org/data/2.5/weather";
-    private static OkHttpClient client = new OkHttpClient();
 
     public WeatherCommand(String apiKey) {
         this._apiKey = apiKey;
@@ -21,27 +20,18 @@ public class WeatherCommand implements CommandInterface {
         // api docs
         //https://openweathermap.org/current#geocoding
 
-        HttpUrl.Builder urlBuild = HttpUrl.parse(this.baseUrl).newBuilder();
+        String baseUrl = "https://api.openweathermap.org/data/2.5/weather";
+        HttpUrl.Builder urlBuild = HttpUrl.parse(baseUrl).newBuilder();
         urlBuild.addQueryParameter("q", intent.slots.get("location"));
         // get metric values, celsius rather then kelvin
         urlBuild.addQueryParameter("units", "metric");
         urlBuild.addQueryParameter("appid", this._apiKey);
 
         var url = urlBuild.build().toString();
-//        System.out.println("[WEATHER COMMAND] url => " + url); // DEBUG
-
-        Request request = new Request.Builder()
-                .url(url)
-                .build();
-
 
         try {
-            Call call = client.newCall(request);
-            Response response = call.execute();
-            var body = response.body().string();
-//            System.out.println("Response body: " + body); // DEBUG
-
-            var json = JsonIterator.deserialize(body);
+            var response = ApiService.CallApiJsonResponse(url);
+            var json = JsonIterator.deserialize(response);
             var description  =  json.get("weather", 0, "description").toString();
 
             // temperature is in celsius
