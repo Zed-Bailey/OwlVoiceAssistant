@@ -1,8 +1,6 @@
-package OwlVoiceAssistant.Commands;
+package OwlVoiceAssistant;
 
 import OwlVoiceAssistant.TextToIntent.Intent;
-
-import java.util.Map;
 
 /**
  * An interface that should be extended by a command class
