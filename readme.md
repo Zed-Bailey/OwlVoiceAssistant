@@ -1,48 +1,53 @@
 # Owl voice assistant
-An offline privacy first voice assistant
+An offline privacy first voice assistant library
 
-## Prerequisites
+## Example
+An example implementation of a simple voice assistant can be found in the `example/` directory
 
-- mpd (Music player daemon) setup and listening on localhost:6600
-  - in the future this will be configured with a config file
+### Running the example
+Copy the `configuration.properties` and `grammar.json` files
+make sure they are in the same directory
 
-## Using a different speech to text model
-download a vosk model from [here](https://alphacephei.com/vosk/models) and unzip it. rename folder to model and place it in the `app/` directory
+then run example implementation with
+`java -jar VoiceAssistant.jar configuration.properties`
+
+Currently, only a simple weather command is implemented.
+You can say `computer whats the weather in london` and a response will be spoken back
 
 
-## Building
-assuming you have graalvm 22.1.0 for jdk 17
-and graalvm `native-image` component installed
+## Implementing your own voice assistant
+To implement your own assistant, extended the abstract class `OwlVoiceAssistant.Assistant` and implement the methods
+
+As a base you can use `example/ExampleAssistant.java` and build on top of that
+The initialize function should call `Assistant.InitializeTTI` and `Assistant.InitializeTTS` and `MapCommands`
+```java
+// example/ExampleAssistant.java
+public class ExampleAssistant extends Assistant {
+    
+    @Override
+    public void Initialize(Properties prop) {
+        this.tti = this.InitializeTTI(prop.getProperty("commandJson"));
+        this.tts = this.InitializeTTS(AssistantVoice.poppy);
+        this.intentMap = this.MapCommands(prop);
+
+        // initialize anything else after
+        // ....
+    }
+}
 ```
-# from root project directory
-./gradlew shadowJar
+Without initializing these the assistant won't function.
 
-# build a native executable 
-native-image -jar app/build/libs/OwlVoiceAssistant-0.1.0-all.jar voice-assistant
+Implementing a new command should extend `CommandInterface` this defines a single method `Execute` that you 
+overwrite with your command functionality. 
 
-# run executable
-./voice-assistant <path to configuration.properties>
-```
+You should handle any possible failures in the function and return a string containing what you want spoken.
+An example implementation is in `example/WeatherCommand.java`
 
 
-## Running
-Create a configuration.properties file with the following key value pairs defined
-```properties
-commandJson={path to grammar json file}
-wakeWord=computer
-openweather_apikey={api key for openweathermap}
-```
-wake word can be any word you want
 
-you can then run the application with
-`java -jar app.jar configuration.properties`
+## Defining Commands
 
-## Commands
-
-existing commands can be found in `app/Grammar.json`
-
-TODO: add more docs here
-TODO: add google command. e.g. `computer google how many punds in an ounce`
+An example command can be found in the `example/` directory
 
 creating your own command
 example weather grammar
@@ -98,11 +103,13 @@ voices were installed with the marytts gui installer (installed with the marytts
 then copied from their install location to this projects `lib/voices` folder
 
 
-## Roadmap
-
-- ability for assistant to change voice
-- more integrations
-- deployment to a raspberry pi
+## Speech to text model
+This library uses vosk for speech to text.
+1. clone this repo
+2. download new model from [here](https://alphacephei.com/vosk/models) and unzip it
+3. rename unzipped folder to model and place it in the `app/` directory
+4. build a new jar with `./gradlew shadowJar`
+5. Use the newly built jar in your project.
 
 
 ## Custom voice
