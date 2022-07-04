@@ -1,16 +1,16 @@
 
 plugins {
-    // Apply the application plugin to add support for building a CLI application in Java.
-    id 'application'
+    id 'java-library'
     id 'com.github.johnrengelman.shadow' version '7.1.2'
     id 'java'
 }
 
+group 'com.zed'
+
 apply plugin: 'com.github.johnrengelman.shadow'
-apply plugin: 'java'
 
 version '0.1.0'
-description 'An offline privacy first home voice assistant'
+description 'An offline, privacy first, voice assistant library'
 
 repositories {
     // Use Maven Central for resolving dependencies.
@@ -55,16 +55,12 @@ dependencies {
         exclude group: 'gov.nist.math', module: 'Jampack'
     }
     // add the voice jars for mary to use
+
     implementation files("lib/voices/voice-dfki-prudence-hsmm-5.2.jar")
     implementation files("lib/voices/voice-dfki-spike-hsmm-5.2.jar")
     implementation files("lib/voices/voice-dfki-poppy-hsmm-5.2.jar")
     implementation files("lib/voices/voice-dfki-obadiah-hsmm-5.2.jar")
 
-}
-
-application {
-    // Define the main class for the application.
-    mainClass = 'OwlVoiceAssistant.example.ExampleAssistant'
 }
 
 tasks.test {
@@ -80,6 +76,6 @@ tasks.test {
 
 
 shadowJar {
-    archiveBaseName.set("OwlVoiceAssistant")
+    archiveBaseName.set("voice-assistant")
     mergeServiceFiles()
 }

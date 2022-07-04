@@ -1,7 +1,7 @@
 package example;
 
-import OwlVoiceAssistant.CommandInterface;
-import OwlVoiceAssistant.TextToIntent.Intent;
+import VoiceAssistant.CommandInterface;
+import VoiceAssistant.TextToIntent.Intent;
 
 import java.util.Properties;
 import java.util.Random;
@@ -20,6 +20,6 @@ public class WeatherCommand implements CommandInterface {
         var weatherConditions = new String[]{"sunny", "windy", "raining", "stormy", "hailing"};
         var random = new Random();
         var randCondition = random.nextInt(weatherConditions.length);
-        return String.format("The weather is %s in %s", randCondition, location);
+        return String.format("The weather is %s in %s", weatherConditions[randCondition], location);
     }
 }

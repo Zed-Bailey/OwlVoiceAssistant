@@ -1,4 +1,4 @@
-package OwlVoiceAssistant;
+package VoiceAssistant;
 
 /**
  * Default MaryTTS voices available to use for the text to speech

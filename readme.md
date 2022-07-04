@@ -16,7 +16,7 @@ You can say `computer whats the weather in london` and a response will be spoken
 
 
 ## Implementing your own voice assistant
-To implement your own assistant, extended the abstract class `OwlVoiceAssistant.Assistant` and implement the methods
+To implement your own assistant, extended the abstract class `VoiceAssistant.Assistant` and implement the methods
 
 As a base you can use `example/ExampleAssistant.java` and build on top of that
 The initialize function should call `Assistant.InitializeTTI` and `Assistant.InitializeTTS` and `MapCommands`

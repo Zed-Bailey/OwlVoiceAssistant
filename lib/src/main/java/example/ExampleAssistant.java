@@ -1,7 +1,7 @@
 package example;
 
-import OwlVoiceAssistant.*;
-import OwlVoiceAssistant.TextToIntent.Intent;
+import VoiceAssistant.*;
+import VoiceAssistant.TextToIntent.Intent;
 import org.apache.log4j.PropertyConfigurator;
 
 import java.io.FileInputStream;

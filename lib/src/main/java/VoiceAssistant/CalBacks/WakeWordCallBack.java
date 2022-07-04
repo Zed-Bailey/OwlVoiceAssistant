@@ -1,4 +1,4 @@
-package OwlVoiceAssistant.CalBacks;
+package VoiceAssistant.CalBacks;
 
 public interface WakeWordCallBack {
     void wakeWordDetected();

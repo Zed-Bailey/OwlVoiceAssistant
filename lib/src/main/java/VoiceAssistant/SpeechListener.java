@@ -1,8 +1,8 @@
-package OwlVoiceAssistant;
+package VoiceAssistant;
 
-import OwlVoiceAssistant.CalBacks.IntentCallBack;
-import OwlVoiceAssistant.CalBacks.WakeWordCallBack;
-import OwlVoiceAssistant.TextToIntent.TTI;
+import VoiceAssistant.CalBacks.IntentCallBack;
+import VoiceAssistant.CalBacks.WakeWordCallBack;
+import VoiceAssistant.TextToIntent.TTI;
 import com.jsoniter.JsonIterator;
 import com.jsoniter.any.Any;
 import org.vosk.LibVosk;

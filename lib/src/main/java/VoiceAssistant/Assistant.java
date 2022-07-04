@@ -1,6 +1,6 @@
-package OwlVoiceAssistant;
+package VoiceAssistant;
 
-import OwlVoiceAssistant.TextToIntent.TTI;
+import VoiceAssistant.TextToIntent.TTI;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 

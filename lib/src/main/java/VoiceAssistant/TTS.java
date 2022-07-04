@@ -1,4 +1,4 @@
-package OwlVoiceAssistant;
+package VoiceAssistant;
 
 import marytts.LocalMaryInterface;
 import marytts.exceptions.MaryConfigurationException;

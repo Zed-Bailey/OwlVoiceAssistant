@@ -1,6 +1,6 @@
-package OwlVoiceAssistant;
+package VoiceAssistant;
 
-import OwlVoiceAssistant.TextToIntent.Intent;
+import VoiceAssistant.TextToIntent.Intent;
 
 /**
  * An interface that should be extended by a command class

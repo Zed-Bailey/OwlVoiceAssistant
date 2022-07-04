@@ -1,6 +1,6 @@
-package OwlVoiceAssistant;
+package VoiceAssistant;
 
-import OwlVoiceAssistant.TextToIntent.TTI;
+import VoiceAssistant.TextToIntent.TTI;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 

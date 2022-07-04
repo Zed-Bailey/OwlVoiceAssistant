@@ -3,6 +3,6 @@
 
 # Ignore Gradle build output directory
 build
-app/log/
-app/model/
-app/native-build/
+lib/log/
+lib/model/
+lib/native-build/

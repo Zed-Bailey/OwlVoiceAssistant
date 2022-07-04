@@ -1,4 +1,4 @@
-package OwlVoiceAssistant.TextToIntent;
+package VoiceAssistant.TextToIntent;
 
 import java.util.HashMap;
 
