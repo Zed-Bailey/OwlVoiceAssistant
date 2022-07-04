@@ -4,16 +4,6 @@ An offline privacy first voice assistant library
 ## Example
 An example implementation of a simple voice assistant can be found in the `example/` directory
 
-### Running the example
-Copy the `configuration.properties` and `grammar.json` files
-make sure they are in the same directory
-
-then run example implementation with
-`java -jar VoiceAssistant.jar configuration.properties`
-
-Currently, only a simple weather command is implemented.
-You can say `computer whats the weather in london` and a response will be spoken back
-
 
 ## Implementing your own voice assistant
 To implement your own assistant, extended the abstract class `VoiceAssistant.Assistant` and implement the methods
