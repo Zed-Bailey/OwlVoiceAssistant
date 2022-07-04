@@ -4,7 +4,6 @@ import OwlVoiceAssistant.*;
 import OwlVoiceAssistant.TextToIntent.Intent;
 import org.apache.log4j.PropertyConfigurator;
 
-import javax.sound.sampled.LineUnavailableException;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
