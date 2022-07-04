@@ -60,16 +60,11 @@ dependencies {
     implementation files("lib/voices/voice-dfki-poppy-hsmm-5.2.jar")
     implementation files("lib/voices/voice-dfki-obadiah-hsmm-5.2.jar")
 
-    implementation 'com.squareup.okhttp3:okhttp:4.9.1'
-
-    // Java API for controlling the Music Player Daemon (MPD)
-    // https://github.com/finnyb/javampd
-    implementation 'com.inthebacklog:javampd:7.1.0'
 }
 
 application {
     // Define the main class for the application.
-    mainClass = 'OwlVoiceAssistant.App'
+    mainClass = 'OwlVoiceAssistant.example.ExampleAssistant'
 }
 
 tasks.test {
