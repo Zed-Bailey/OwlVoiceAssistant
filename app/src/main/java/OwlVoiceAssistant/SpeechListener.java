@@ -1,6 +1,7 @@
 package OwlVoiceAssistant;
 
-import OwlVoiceAssistant.TextToIntent.Intent;
+import OwlVoiceAssistant.CalBacks.IntentCallBack;
+import OwlVoiceAssistant.CalBacks.WakeWordCallBack;
 import OwlVoiceAssistant.TextToIntent.TTI;
 import com.jsoniter.JsonIterator;
 import com.jsoniter.any.Any;
@@ -17,15 +18,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Objects;
 
-interface WakeWordCallBack {
-    void wakeWordDetected();
-}
 
-interface IntentCallBack {
-    void intentParsed(Intent intent);
-}
-
-
+//TODO: This class needs a better name! CommandListener?
 public class SpeechListener {
 
     private final String wakeWord;
@@ -33,21 +27,40 @@ public class SpeechListener {
     private IntentCallBack intentCallBack;
     private final TTI _tti;
 
+    /**
+     * Create a new Listener object
+     * @param wakeWord the wake word to listen for
+     * @param tti a text to intent object initialized with the grammar file
+     */
     public SpeechListener(String wakeWord, TTI tti) {
         this.wakeWord = wakeWord;
         this._tti = tti;
     }
 
+    /**
+     * Sets the wake word callback function
+     * @param w the callback
+     * @return returns itself modified
+     */
     public SpeechListener setWakeWordCallback(WakeWordCallBack w) {
         this.wakeWordCallBack = w;
         return this;
     }
 
+    /**
+     * Set the intent callback. called once the command has been parsed
+     * @param i the callback
+     * @return returns itself modified
+     */
     public SpeechListener setIntentCallBack(IntentCallBack i) {
         this.intentCallBack = i;
         return this;
     }
 
+    /**
+     * Start listening through the microphone for commands
+     * @throws IOException
+     */
     public void Start() throws IOException {
         LibVosk.setLogLevel(LogLevel.DEBUG);
 
@@ -89,6 +102,11 @@ public class SpeechListener {
                         if (stt.contains(wakeWord)) {
                             // remove wake word from command
                             stt = stt.replace(wakeWord, "").trim();
+                            if (stt.equalsIgnoreCase("shutdown")) {
+                                shutdown = true;
+                                continue;
+                            }
+
                             // parse intent
                             var intent = _tti.ParseTextToCommand(stt);
 
